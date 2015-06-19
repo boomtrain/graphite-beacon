@@ -32,6 +32,7 @@ class Reactor(object):
         'debug': False,
         'format': 'short',
         'graphite_url': 'http://localhost',
+        'graphite_error_level': 'critical',
         'history_size': '1day',
         'interval': '10minute',
         'logging': 'info',

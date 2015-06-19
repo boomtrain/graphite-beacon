@@ -213,7 +213,8 @@ class GraphiteAlert(BaseAlert):
                 self.check(data)
                 self.notify('normal', 'Metrics are loaded', target='loading', ntype='common')
             except Exception as e:
-                self.notify('critical', 'Loading error: %s' % e, target='loading', ntype='common')
+                level = options.get('graphite_error_level', self.reactor.options['graphite_error_level'])
+                self.notify(level, 'Loading error: %s' % e, target='loading', ntype='common')
             self.waiting = False
 
     def get_graph_url(self, target, graphite_url=None):
