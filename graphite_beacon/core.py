@@ -9,6 +9,11 @@ from .alerts import BaseAlert
 from .utils import parse_interval
 from .handlers import registry
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 
 LOGGER = log.gen_log
 
@@ -27,6 +32,7 @@ class Reactor(object):
         'debug': False,
         'format': 'short',
         'graphite_url': 'http://localhost',
+        'graphite_error_level': 'critical',
         'history_size': '1day',
         'interval': '10minute',
         'logging': 'info',
@@ -79,10 +85,11 @@ class Reactor(object):
     def include_config(self, config):
         LOGGER.info('Load configuration: %s' % config)
         if config:
+            loader = yaml.load if yaml and config.endswith('.yml') else json.loads
             try:
                 with open(config) as fconfig:
                     source = COMMENT_RE.sub("", fconfig.read())
-                    config = json.loads(source)
+                    config = loader(source)
                     self.options.update(config)
             except (IOError, ValueError):
                 LOGGER.error('Invalid config file: %s' % config)
