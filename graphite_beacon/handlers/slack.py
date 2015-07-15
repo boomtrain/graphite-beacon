@@ -16,6 +16,12 @@ class SlackHandler(AbstractHandler):
         'username': 'graphite-beacon',
     }
 
+    colors = {
+        'critical': '#dc322f',
+        'warning': '#b58900',
+        'normal': '#859900',
+    }
+
     emoji = {
         'critical': ':exclamation:',
         'warning': ':warning:',
@@ -39,16 +45,66 @@ class SlackHandler(AbstractHandler):
             level=level, reactor=self.reactor, alert=alert, value=value, target=target).strip()
 
     @gen.coroutine
-    def notify(self, level, *args, **kwargs):
+    def notify(self, level, alert, value, **kwargs):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
-        message = self.get_message(level, *args, **kwargs)
+        message = self.get_message(level, alert, value, **kwargs)
         data = dict()
         data['username'] = self.username
-        data['text'] = message
+        # data['text'] = message
         data['icon_emoji'] = self.emoji.get(level, ':warning:')
         if self.channel:
             data['channel'] = self.channel
+        # alert = args[0]
+        # value = args[1]
+        target = kwargs['target']
+        rule = kwargs['rule']
+        url = alert.get_attachment_url(target)
+        colors = {
+            'crit'
+        }
+        data['attachments'] = [{
+            'image_url': url,
+            # 'color': "#39C",
+            'color': self.colors[level],
+            # 'text': "Alert is now at {}".format(level),
+            'title': alert.name,
+            'title_link': url,
+            'fields': [
+                {
+                    "title": "Rule",
+                    "value": rule['raw'],
+                    "short": False,
+                },
+                {
+                    "title": "Target",
+                    "value": target,
+                    "short": False,
+                },
+                {
+                    "title": "Value",
+                    "value": alert.convert(value),
+                    "short": True
+                },
+                {
+                    "title": "Level",
+                    "value": level,
+                    "short": True
+                },
+            ]
+        }]
+        # {
+        #     "attachments": [
+        #         {
+        #             "fallback": "Network traffic (kb/s): How does this look? @slack-ops - Sent by Julie Dodd - https://datadog.com/path/to/event",
+        #             "title": "Network traffic (kb/s)",
+        #             "title_link": "https://datadog.com/path/to/event",
+        #             "text": "How does this look? @slack-ops - Sent by Julie Dodd",
+        #             "image_url": "https://datadoghq.com/snapshot/path/to/snapshot.png",
+        #             "color": "#764FA5"
+        #         }
+        #     ]
+        # }
 
         body = json.dumps(data)
         yield self.client.fetch(self.webhook, method='POST', body=body)

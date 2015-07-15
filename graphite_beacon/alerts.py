@@ -6,7 +6,7 @@ from .utils import convert_to_format, parse_interval, parse_rule, HISTORICAL, LO
 import math
 from collections import deque, defaultdict
 from itertools import islice
-
+import urllib
 
 LOGGER = log.gen_log
 METHODS = "average", "last_value", "sum"
@@ -240,12 +240,28 @@ class GraphiteAlert(BaseAlert):
     def get_graph_url(self, target, graphite_url=None):
         return self._graphite_url(target, graphite_url=graphite_url, raw_data=False)
 
+    def get_attachment_url(self, target):
+        graphite_url = self.reactor.options['graphite_url']
+        args = {
+            'target': target,
+            'from': '-2h',
+            'yMin': 0,
+            'width': 800,
+            'height': 400,
+            'title': self.name,
+        }
+        return "{base}/render.png?{args}".format(
+            base=graphite_url,
+            args=urllib.urlencode(args),
+        )
+
     def _graphite_url(self, query, raw_data=False, graphite_url=None):
         """ Build Graphite URL. """
         query = escape.url_escape(query)
         graphite_url = graphite_url or self.reactor.options['graphite_url']
         url = "{base}/render/?target={query}&from=-{time_window}&until=-{until}".format(
-            base=graphite_url, query=query, time_window=self.time_window, until=self.until)
+            base=graphite_url, query=query, time_window=self.time_window, until=self.until
+        )
         if raw_data:
             url = "{0}&rawData=true".format(url)
         return url
