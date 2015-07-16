@@ -1,2 +1,4 @@
 tornado == 4.1.0
 funcparserlib==0.3.6
+slacker
+requests

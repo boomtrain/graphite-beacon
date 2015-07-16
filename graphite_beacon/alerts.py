@@ -240,19 +240,20 @@ class GraphiteAlert(BaseAlert):
     def get_graph_url(self, target, graphite_url=None):
         return self._graphite_url(target, graphite_url=graphite_url, raw_data=False)
 
-    def get_attachment_url(self, target):
+    def get_attachment_url(self):
         graphite_url = self.reactor.options['graphite_url']
+        LOGGER.info('Query: %s' % self.query)
         args = {
-            'target': target,
+            'target': self.query,
             'from': '-2h',
             'yMin': 0,
             'width': 800,
             'height': 400,
             'title': self.name,
         }
-        return "{base}/render.png?{args}".format(
-            base=graphite_url,
-            args=urllib.urlencode(args),
+        LOGGER.info('args: %s' % urllib.urlencode(args))
+        return "{base}/render/?{args}".format(
+            base=graphite_url, args=urllib.urlencode(args),
         )
 
     def _graphite_url(self, query, raw_data=False, graphite_url=None):
