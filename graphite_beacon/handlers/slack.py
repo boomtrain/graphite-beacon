@@ -73,14 +73,23 @@ class SlackHandler(AbstractHandler):
         else:
             rule = 'N/A'
 
-        self.slack.chat.post_message(
-            self.channel_id,
-            text='',
-            username=self.username,
-            icon_emoji=self.emoji.get(level, ':warning:'),
-            attachments=[{
-                'title': 'Graphite-beacon alert',
-                # 'title_link': image_urln,
+        if level == 'normal':
+            attachment = {
+                'image_url': uploaded_url,
+                'color': self.colors[level],
+                'fields': [
+                    {
+                        'title': 'Alert Cleared',
+                        'value': "<{0}|{1}>".format(image_url, alert.name),
+                        'short': False
+                    },
+                    { 'title': 'Target', 'value': target, 'short': False },
+                    { 'title': 'Rule', 'value': 'Cleared', 'short': True },
+                    { 'title': 'Value', 'value': alert.convert(value), 'short': True },
+                ]
+            }
+        else:
+            attachment = {
                 'image_url': uploaded_url,
                 'color': self.colors[level],
                 'fields': [
@@ -93,6 +102,13 @@ class SlackHandler(AbstractHandler):
                     { 'title': 'Rule', 'value': rule, 'short': True },
                     { 'title': 'Value', 'value': alert.convert(value), 'short': True },
                 ]
-            }]
+            }
+
+        self.slack.chat.post_message(
+            self.channel_id,
+            text='',
+            username=self.username,
+            icon_emoji=self.emoji.get(level, ':warning:'),
+            attachments=[attachment]
         )
         return True
