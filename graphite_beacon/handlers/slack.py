@@ -64,11 +64,14 @@ class SlackHandler(AbstractHandler):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
         target = kwargs['target']
-        rule = kwargs['rule']
         # message = self.get_message(level, alert, value, **kwargs)
 
-        image_url = alert.get_attachment_url()
+        image_url = alert.get_attachment_url(target)
         uploaded_url = self.post_image(image_url)
+        if 'rule' in kwargs and 'raw' in kwargs['rule']:
+            rule = kwargs['rule']['raw']
+        else:
+            rule = 'N/A'
 
         self.slack.chat.post_message(
             self.channel_id,
@@ -87,64 +90,9 @@ class SlackHandler(AbstractHandler):
                         'short': False
                     },
                     { 'title': 'Target', 'value': target, 'short': False },
-                    { 'title': 'Rule', 'value': rule['raw'], 'short': True },
+                    { 'title': 'Rule', 'value': rule, 'short': True },
                     { 'title': 'Value', 'value': alert.convert(value), 'short': True },
                 ]
             }]
         )
         return True
-
-        # data = dict()
-        # data['username'] = self.username
-        # data['text'] = message
-        # data['icon_emoji'] = self.emoji.get(level, ':warning:')
-        # if self.channel:
-        #     data['channel'] = self.channel
-        # alert = args[0]
-        # value = args[1]
-
-        # data['attachments'] = [{
-        #     'image_url': image_url,
-        #     'color': self.colors[level],
-        #     'title': alert.name,
-        #     'title_link': url,
-        #     'fields': [
-        #         {
-        #             "title": "Rule",
-        #             "value": rule['raw'],
-        #             "short": False,
-        #         },
-        #         {
-        #             "title": "Target",
-        #             "value": target,
-        #             "short": False,
-        #         },
-        #         {
-        #             "title": "Value",
-        #             "value": alert.convert(value),
-        #             "short": True
-        #         },
-        #         {
-        #             "title": "Level",
-        #             "value": level.title(),
-        #             "short": True
-        #         },
-        #     ]
-        # }]
-
-        # {
-        #     "attachments": [
-        #         {
-        #             "fallback": "Network traffic (kb/s): How does this look? @slack-ops - Sent by Julie Dodd - https://datadog.com/path/to/event",
-        #             "title": "Network traffic (kb/s)",
-        #             "title_link": "https://datadog.com/path/to/event",
-        #             "text": "How does this look? @slack-ops - Sent by Julie Dodd",
-        #             "image_url": "https://datadoghq.com/snapshot/path/to/snapshot.png",
-        #             "color": "#764FA5"
-        #         }
-        #     ]
-        # }
-
-        # body = json.dumps(data)
-        # slack.chat.post_message(self.channel, '', attachments=)
-        # yield self.client.fetch(self.webhook, method='POST', body=body)
