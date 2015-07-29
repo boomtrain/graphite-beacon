@@ -1,7 +1,6 @@
-import json
 from slacker import Slacker
 import requests
-from tornado import gen, httpclient as hc
+from tornado import httpclient as hc
 
 from . import AbstractHandler, LOGGER
 from ..template import TEMPLATES
@@ -68,9 +67,9 @@ class SlackHandler(AbstractHandler):
 
         image_url = alert.get_attachment_url(target)
         uploaded_url = self.post_image(image_url)
-        if 'rule' in kwargs and 'raw' in kwargs['rule']:
+        try:
             rule = kwargs['rule']['raw']
-        else:
+        except (KeyError, TypeError):
             rule = 'N/A'
 
         if level == 'normal':
