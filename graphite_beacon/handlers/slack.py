@@ -5,6 +5,10 @@ from tornado import httpclient as hc
 from . import AbstractHandler, LOGGER
 from ..template import TEMPLATES
 
+INTERNAL_ERRORS = (
+    'loading',
+    'waiting',
+)
 
 class SlackHandler(AbstractHandler):
 
@@ -72,7 +76,19 @@ class SlackHandler(AbstractHandler):
         except (KeyError, TypeError):
             rule = 'N/A'
 
-        if level == 'normal':
+        if target in INTERNAL_ERRORS:
+            attachment = {
+                'color': self.colors[level],
+                'fields': [
+                    {
+                        'title': 'Monitoring Error',
+                        'value': "<{0}|{1}>".format(image_url, value),
+                        'short': False
+                    },
+                    {'title': 'Target', 'value': target, 'short': False},
+                ]
+            }
+        elif level == 'normal':
             attachment = {
                 'image_url': uploaded_url,
                 'color': self.colors[level],
@@ -82,9 +98,9 @@ class SlackHandler(AbstractHandler):
                         'value': "<{0}|{1}>".format(image_url, alert.name),
                         'short': False
                     },
-                    { 'title': 'Target', 'value': target, 'short': False },
-                    { 'title': 'Rule', 'value': 'Cleared', 'short': True },
-                    { 'title': 'Value', 'value': alert.convert(value), 'short': True },
+                    {'title': 'Target', 'value': target, 'short': False},
+                    {'title': 'Rule', 'value': 'Cleared', 'short': True},
+                    {'title': 'Value', 'value': alert.convert(value), 'short': True},
                 ]
             }
         else:
@@ -97,9 +113,9 @@ class SlackHandler(AbstractHandler):
                         'value': "<{0}|{1}>".format(image_url, alert.name),
                         'short': False
                     },
-                    { 'title': 'Target', 'value': target, 'short': False },
-                    { 'title': 'Rule', 'value': rule, 'short': True },
-                    { 'title': 'Value', 'value': alert.convert(value), 'short': True },
+                    {'title': 'Target', 'value': target, 'short': False},
+                    {'title': 'Rule', 'value': rule, 'short': True},
+                    {'title': 'Value', 'value': alert.convert(value), 'short': True},
                 ]
             }
 
