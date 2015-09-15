@@ -82,10 +82,14 @@ class SlackHandler(AbstractHandler):
                 'fields': [
                     {
                         'title': 'Monitoring Error',
-                        'value': "<{0}|{1}>".format(image_url, value),
+                        'value': value,
                         'short': False
                     },
-                    {'title': 'Target', 'value': target, 'short': False},
+                    {
+                        'title': 'Target',
+                        'value': alert.name,
+                        'short': False
+                    },
                 ]
             }
         elif level == 'normal':
