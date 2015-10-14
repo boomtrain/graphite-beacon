@@ -113,6 +113,9 @@ class BaseAlert(_.with_metaclass(AlertFabric)):
         else:
             self.callback = ioloop.PeriodicCallback(self.load, interval)
 
+        # Notification channel override.
+        self.channel = options.get('channel', None)
+
     def convert(self, value):
         return convert_to_format(value, self._format)
 

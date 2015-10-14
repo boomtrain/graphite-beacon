@@ -1,16 +1,19 @@
+"""Dispatch alerts via Slack."""
 from slacker import Slacker
 import requests
 from tornado import httpclient as hc
 
 from . import AbstractHandler, LOGGER
-from ..template import TEMPLATES
 
 INTERNAL_ERRORS = (
     'loading',
     'waiting',
 )
 
+
 class SlackHandler(AbstractHandler):
+
+    """Dispatch alerts via Slack."""
 
     name = 'slack'
 
@@ -34,31 +37,22 @@ class SlackHandler(AbstractHandler):
     }
 
     def init_handler(self):
+        """Startup initialization for Slack."""
         self.token = self.options.get('token')
         assert self.token, 'Slack api token is not defined.'
         self.slack = Slacker(self.token)
-
-        self.channel = self.options.get('channel')
-        self.channel_id = self.slack.channels.get_channel_id(self.channel)
-        # if self.channel and self.channel[0] not in ('#', '@'):
-        #     self.channel = '#' + self.channel
         self.username = self.options.get('username')
         self.client = hc.AsyncHTTPClient()
 
-    def get_message(self, level, alert, value, target=None, ntype=None, rule=None):
-        msg_type = 'slack' if ntype == 'graphite' else 'short'
-        tmpl = TEMPLATES[ntype][msg_type]
-        return tmpl.generate(
-            level=level, reactor=self.reactor, alert=alert, value=value, target=target).strip()
-
     def post_image(self, url):
+        """Post an image to Slack so it can be attached to a message."""
         d = requests.get(url)
         if d.status_code != 200:
             return None
         r = self.slack.files.post(
             'files.upload',
             files={'file': d.content},
-            params={'filename':'graphite-beacon'},
+            params={'filename': 'graphite-beacon'},
         )
         return r.body['file']['url']
 
@@ -67,7 +61,6 @@ class SlackHandler(AbstractHandler):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
         target = kwargs['target']
-        # message = self.get_message(level, alert, value, **kwargs)
 
         image_url = alert.get_attachment_url(target)
         uploaded_url = self.post_image(image_url)
@@ -76,20 +69,26 @@ class SlackHandler(AbstractHandler):
         except (KeyError, TypeError):
             rule = 'N/A'
 
+        # Allow for overridable channel per-rule.
+
+        if alert.channel:
+            channel = alert.channel
+        else:
+            channel = self.options.get('channel')
+
+        # For the lazy. (i.e. Me.)
+        def _short(title, value):
+            return {'title': title, 'value': value, 'short': True}
+
+        def _long(title, value):
+            return {'title': title, 'value': value, 'short': False}
+
         if target in INTERNAL_ERRORS:
             attachment = {
                 'color': self.colors[level],
                 'fields': [
-                    {
-                        'title': 'Monitoring Error',
-                        'value': value,
-                        'short': False
-                    },
-                    {
-                        'title': 'Target',
-                        'value': alert.name,
-                        'short': False
-                    },
+                    _long('Monitoring Error', value),
+                    _long('Target', alert.name),
                 ]
             }
         elif level == 'normal':
@@ -97,14 +96,13 @@ class SlackHandler(AbstractHandler):
                 'image_url': uploaded_url,
                 'color': self.colors[level],
                 'fields': [
-                    {
-                        'title': 'Alert Cleared',
-                        'value': "<{0}|{1}>".format(image_url, alert.name),
-                        'short': False
-                    },
-                    {'title': 'Target', 'value': target, 'short': False},
-                    {'title': 'Rule', 'value': 'Cleared', 'short': True},
-                    {'title': 'Value', 'value': alert.convert(value), 'short': True},
+                    _long(
+                        'Alert Cleared',
+                        "<{0}|{1}>".format(image_url, alert.name)
+                    ),
+                    _long('Target', target),
+                    _short('Rule', 'Cleared'),
+                    _short('Value', alert.convert(value)),
                 ]
             }
         else:
@@ -112,19 +110,19 @@ class SlackHandler(AbstractHandler):
                 'image_url': uploaded_url,
                 'color': self.colors[level],
                 'fields': [
-                    {
-                        'title': 'Alert Triggered',
-                        'value': "<{0}|{1}>".format(image_url, alert.name),
-                        'short': False
-                    },
-                    {'title': 'Target', 'value': target, 'short': False},
-                    {'title': 'Rule', 'value': rule, 'short': True},
-                    {'title': 'Value', 'value': alert.convert(value), 'short': True},
+                    _long(
+                        'Alert Triggered',
+                        "<{0}|{1}>".format(image_url, alert.name)
+                    ),
+                    _long('Target', target),
+                    _short('Rule', rule),
+                    _short('Value', alert.convert(value)),
                 ]
             }
 
+        channel_id = self.slack.channels.get_channel_id(channel)
         self.slack.chat.post_message(
-            self.channel_id,
+            channel_id,
             text='',
             username=self.username,
             icon_emoji=self.emoji.get(level, ':warning:'),
