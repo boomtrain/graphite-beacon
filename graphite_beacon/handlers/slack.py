@@ -52,7 +52,7 @@ class SlackHandler(AbstractHandler):
         r = self.slack.files.post(
             'files.upload',
             files={'file': d.content},
-            params={'filename': 'graphite-beacon.png'},
+            params={'filename': 'graphite-beacon.png', 'filetype': 'png'},
         )
         try:
             url = r.body['file']['url_private']
