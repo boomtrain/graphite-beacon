@@ -57,6 +57,7 @@ class SlackHandler(AbstractHandler):
         try:
             return r.body['file']['url_private']
         except KeyError:
+            LOGGER.error("Unable to get URL for image: %r", r)
             return None
 
     # @gen.coroutine
