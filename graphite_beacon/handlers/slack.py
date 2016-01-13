@@ -101,10 +101,7 @@ class SlackHandler(AbstractHandler):
                 'image_url': self.post_image(image_url),
                 'color': self.colors[level],
                 'fields': [
-                    _long(
-                        'Alert Cleared',
-                        "<{0}|{1}>".format(image_url, alert.name)
-                    ),
+                    _long('Alert Cleared', alert.name),
                     _long('Target', target),
                     _short('Rule', 'Cleared'),
                     _short('Value', alert.convert(value)),
@@ -115,10 +112,7 @@ class SlackHandler(AbstractHandler):
                 'image_url': self.post_image(image_url),
                 'color': self.colors[level],
                 'fields': [
-                    _long(
-                        'Alert Triggered',
-                        "<{0}|{1}>".format(image_url, alert.name)
-                    ),
+                    _long('Alert Triggered', alert.name),
                     _long('Target', target),
                     _short('Rule', rule),
                     _short('Value', alert.convert(value)),
@@ -126,6 +120,7 @@ class SlackHandler(AbstractHandler):
             }
 
         channel_id = self.slack.channels.get_channel_id(channel)
+        LOGGER.info("Posting message with attachment: %r", attachment)
         self.slack.chat.post_message(
             channel_id,
             text='',
