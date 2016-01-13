@@ -55,7 +55,9 @@ class SlackHandler(AbstractHandler):
             params={'filename': 'graphite-beacon'},
         )
         try:
-            return r.body['file']['url_private']
+            url = r.body['file']['url_private']
+            LOGGER.info("Posted URL: %s", url)
+            return url
         except KeyError:
             LOGGER.error("Unable to get URL for image: %r", r)
             return None
