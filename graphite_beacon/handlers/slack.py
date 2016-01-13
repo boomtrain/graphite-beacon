@@ -69,7 +69,6 @@ class SlackHandler(AbstractHandler):
         target = kwargs['target']
 
         image_url = alert.get_attachment_url(target)
-        uploaded_url = self.post_image(image_url)
         try:
             rule = kwargs['rule']['raw']
         except (KeyError, TypeError):
@@ -99,7 +98,7 @@ class SlackHandler(AbstractHandler):
             }
         elif level == 'normal':
             attachment = {
-                'image_url': uploaded_url,
+                'image_url': self.post_image(image_url),
                 'color': self.colors[level],
                 'fields': [
                     _long(
@@ -113,7 +112,7 @@ class SlackHandler(AbstractHandler):
             }
         else:
             attachment = {
-                'image_url': uploaded_url,
+                'image_url': self.post_image(image_url),
                 'color': self.colors[level],
                 'fields': [
                     _long(
