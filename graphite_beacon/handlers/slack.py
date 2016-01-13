@@ -54,7 +54,10 @@ class SlackHandler(AbstractHandler):
             files={'file': d.content},
             params={'filename': 'graphite-beacon'},
         )
-        return r.body['file']['url']
+        try:
+            return r.body['file']['url_private']
+        except KeyError:
+            return None
 
     # @gen.coroutine
     def notify(self, level, alert, value, **kwargs):
