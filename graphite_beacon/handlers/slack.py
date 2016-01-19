@@ -30,7 +30,7 @@ class SlackHandler(AbstractHandler):
         'critical': '#dc322f',
         'warning': '#b58900',
         'normal': '#859900',
-        'internal': '#cc00ff',
+        'internal': '#6c71c4',
     }
 
     emoji = {
