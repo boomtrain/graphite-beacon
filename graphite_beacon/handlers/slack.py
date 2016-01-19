@@ -10,6 +10,8 @@ INTERNAL_ERRORS = (
     'waiting',
 )
 
+BOT_CHANNEL = '#bot_files'
+
 
 class SlackHandler(AbstractHandler):
 
@@ -28,12 +30,14 @@ class SlackHandler(AbstractHandler):
         'critical': '#dc322f',
         'warning': '#b58900',
         'normal': '#859900',
+        'internal': '#cc00ff',
     }
 
     emoji = {
         'critical': ':exclamation:',
         'warning': ':warning:',
         'normal': ':white_check_mark:',
+        'internal': ':broken_heart:',
     }
 
     def init_handler(self):
@@ -52,7 +56,11 @@ class SlackHandler(AbstractHandler):
         r = self.slack.files.post(
             'files.upload',
             files={'file': d.content},
-            params={'filename': 'graphite-beacon.png', 'filetype': 'png'},
+            params={
+                'filename': 'graphite-beacon.png',
+                'filetype': 'png',
+                'channels': BOT_CHANNEL,
+            },
         )
         try:
             url = r.body['file']['url_private']
@@ -89,6 +97,7 @@ class SlackHandler(AbstractHandler):
             return {'title': title, 'value': value, 'short': False}
 
         if target in INTERNAL_ERRORS:
+            level = 'internal'
             attachment = {
                 'color': self.colors[level],
                 'fields': [
