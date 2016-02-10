@@ -9,7 +9,9 @@ INTERNAL_ERRORS = (
     'loading',
     'waiting',
 )
-
+INTERNAL_RECOVERY = (
+    'Metrics are loaded',
+)
 BOT_CHANNEL = '#bot_files'
 
 
@@ -31,6 +33,7 @@ class SlackHandler(AbstractHandler):
         'warning': '#b58900',
         'normal': '#859900',
         'internal': '#6c71c4',
+        'internal_good': '#268bd2',
     }
 
     emoji = {
@@ -38,6 +41,7 @@ class SlackHandler(AbstractHandler):
         'warning': ':warning:',
         'normal': ':white_check_mark:',
         'internal': ':broken_heart:',
+        'internal_good': ':heart:',
     }
 
     def init_handler(self):
@@ -97,7 +101,10 @@ class SlackHandler(AbstractHandler):
             return {'title': title, 'value': value, 'short': False}
 
         if target in INTERNAL_ERRORS:
-            level = 'internal'
+            if alert.name in INTERNAL_RECOVERY:
+                level = 'internal_good'
+            else:
+                level = 'internal'
             attachment = {
                 'color': self.colors[level],
                 'fields': [
