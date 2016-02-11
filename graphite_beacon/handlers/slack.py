@@ -101,7 +101,7 @@ class SlackHandler(AbstractHandler):
             return {'title': title, 'value': value, 'short': False}
 
         if target in INTERNAL_ERRORS:
-            if alert.name in INTERNAL_RECOVERY:
+            if value in INTERNAL_RECOVERY:
                 level = 'internal_good'
             else:
                 level = 'internal'
