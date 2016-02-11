@@ -103,12 +103,14 @@ class SlackHandler(AbstractHandler):
         if target in INTERNAL_ERRORS:
             if value in INTERNAL_RECOVERY:
                 level = 'internal_good'
+                title = 'Monitoring Recovery'
             else:
                 level = 'internal'
+                title = 'Monitoring Error'
             attachment = {
                 'color': self.colors[level],
                 'fields': [
-                    _long('Monitoring Error', value),
+                    _long(title, value),
                     _long('Target', alert.name),
                 ]
             }
