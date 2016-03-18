@@ -1,4 +1,5 @@
 import signal
+import boomtrain.logging
 
 from tornado.options import define, options
 
@@ -11,6 +12,7 @@ define('graphite_url', default=Reactor.defaults['graphite_url'], help='Graphite 
 
 
 def run():
+    boomtrain.logging.setup()
     options.parse_command_line()
 
     r = Reactor(**options.as_dict())
