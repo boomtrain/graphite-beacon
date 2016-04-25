@@ -9,7 +9,7 @@ from itertools import islice
 import urllib
 
 LOGGER = log.gen_log
-METHODS = "average", "last_value", "sum"
+METHODS = "average", "last_value", "sum", "min", "max"
 LEVELS = {
     'critical': 0,
     'warning': 10,
