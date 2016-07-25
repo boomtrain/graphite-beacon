@@ -14,7 +14,6 @@ INTERNAL_RECOVERY = (
 )
 BOT_CHANNEL = '#bot_files'
 
-
 class SlackHandler(AbstractHandler):
 
     """Dispatch alerts via Slack."""

@@ -1,7 +1,8 @@
 import urllib
+
 from tornado import gen, httpclient as hc
 
-from . import AbstractHandler, LOGGER
+from graphite_beacon.handlers import AbstractHandler, LOGGER
 
 
 class HttpHandler(AbstractHandler):
@@ -31,6 +32,11 @@ class HttpHandler(AbstractHandler):
             data['target'] = target
         if rule:
             data['rule'] = rule['raw']
+
+        if alert.source == 'graphite':
+            data['graph_url'] = alert.get_graph_url(target)
+            data['value'] = value
+
         data.update(self.params)
         body = urllib.urlencode(data)
         yield self.client.fetch(self.url, method=self.method, body=body)

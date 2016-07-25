@@ -35,17 +35,22 @@ class Reactor(object):
         'graphite_error_level': 'critical',
         'history_size': '1day',
         'interval': '10minute',
-        'until': '0second',
         'logging': 'info',
         'method': 'average',
         'no_data': 'critical',
         'normal_handlers': ['log', 'smtp'],
         'pidfile': None,
         'prefix': '[BEACON]',
+        'public_graphite_url': None,
         'repeat_interval': '2hour',
         'request_timeout': 20.0,
+        'connect_timeout': 20.0,
         'send_initial': False,
+        'until': '0second',
         'warning_handlers': ['log', 'smtp'],
+        'default_nan_value': 0,
+        'ignore_nan': False,
+        'loading_error': 'critical'
     }
 
     def __init__(self, **options):
@@ -64,6 +69,9 @@ class Reactor(object):
         self.include_config(self.options.get('config'))
         for config in self.options.pop('include', []):
             self.include_config(config)
+
+        if not self.options['public_graphite_url']:
+            self.options['public_graphite_url'] = self.options['graphite_url']
 
         LOGGER.setLevel(_get_numeric_log_level(self.options.get('logging', 'info')))
         registry.clean()

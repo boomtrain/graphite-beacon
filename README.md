@@ -18,7 +18,6 @@ Features:
 [![Version](http://img.shields.io/pypi/v/graphite-beacon.svg?style=flat-square)](https://pypi.python.org/pypi/graphite_beacon)
 [![License](http://img.shields.io/pypi/l/graphite-beacon.svg?style=flat-square)](https://pypi.python.org/pypi/graphite_beacon)
 [![Downloads](http://img.shields.io/pypi/dm/graphite-beacon.svg?style=flat-square)](https://pypi.python.org/pypi/graphite_beacon)
-[![Donate](http://img.shields.io/gratipay/klen.svg?style=flat-square)](https://www.gratipay.com/klen/)
 
 Example:
 ```js
@@ -125,6 +124,10 @@ Value units:
         // Graphite server URL
         "graphite_url": "http://localhost",
 
+        // Public graphite server URL
+        // Used when notifying handlers, defaults to graphite_url
+        "public_graphite_url": null,
+
         // HTTP AUTH username
         "auth_username": null,
 
@@ -135,11 +138,11 @@ Value units:
         "pidfile": null,
 
         // Default values format (none, bytes, s, ms, short)
-        // Can be redfined for each alert.
+        // Can be redefined for each alert.
         "format": "short",
 
         // Default query interval
-        // Can be redfined for each alert.
+        // Can be redefined for each alert.
         "interval": "10minute",
 
         // Default time window for Graphite queries
@@ -165,6 +168,11 @@ Value units:
         // Can be redefined for each alert
         "no_data": "critical",
 
+        // Default alert to send when loading failed (timeout, server error, etc)
+        // (normal = no alert)
+        // Can be redefined for each alert
+        "loading_error": "critical"
+
         // Default prefix (used for notifications)
         "prefix": "[BEACON]",
 
@@ -175,6 +183,10 @@ Value units:
 
         // Send initial values (Send current values when reactor starts)
         "send_initial": true,
+
+        // used together to ignore the missing value
+        "default_nan_value": -1,
+        "ignore_nan": false,
 
         // Default alerts (see configuration below)
         "alerts": []
@@ -421,6 +433,20 @@ Enable "pagerduty" handler and set the options in your beacon configuration.
 }
 ```
 
+### Setup TelegramHandler
+
+Enable "telegram" handler and set the options in your beacon configuration.
+```js
+{
+    ...
+    "telegram": {
+        "token": "telegram bot token",
+        "bot_ident": "token used to activate bot in a group"
+    },
+    ...
+}
+```
+
 ### Command line
 
 ```
@@ -461,24 +487,36 @@ the issue tracker at https://github.com/klen/graphite-beacon/issues
 Contributors
 -------------
 
-* Kirill Klenov     (https://github.com/klen, horneds@gmail.com)
-
 * Andrej Kuročenko (https://github.com/kurochenko)
 * Cody Soyland (https://github.com/codysoyland)
 * Garrett Heel (https://github.com/GarrettHeel)
 * George Ionita (https://github.com/georgeionita)
 * James Yuzawa (https://github.com/yuzawa-san)
+* Kirill Klenov (https://github.com/klen)
 * Konstantin Bakulin (https://github.com/kbakulin)
+* Lammert Hellinga (https://github.com/Kogelvis)
 * Miguel Moll (https://github.com/MiguelMoll)
 * Nick Pillitteri (https://github.com/56quarters)
 * Niku Toivola (https://github.com/nikut)
 * Olli-Pekka Puolitaival (https://github.com/OPpuolitaival)
+* Phillip Hagedorn (https://github.com/phagedorn)
 * Raine Virta (https://github.com/raine)
 * Scott Nonnenberg (https://github.com/scottnonnenberg)
+* Sean Johnson (https://github.com/pirogoeth)
+* Terry Peng (https://github.com/tpeng)
 * Thomas Clavier (https://github.com/tclavier)
+* Yuriy Ilyin (https://github.com/YuriyIlyin)
 * dugeem (https://github.com/dugeem)
 
 License
 --------
 
 Licensed under a [MIT license](http://www.linfo.org/mitlicense.html)
+
+If you wish to express your appreciation for the role, you are welcome to send
+a postcard to:
+
+    Kirill Klenov
+    pos. Severny 8-3
+    MO, Istra, 143500
+    Russia
