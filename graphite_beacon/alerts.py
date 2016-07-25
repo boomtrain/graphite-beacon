@@ -17,7 +17,8 @@ from collections import deque, defaultdict
 from itertools import islice
 import urllib
 
-LOGGER = log.gen_log
+#LOGGER = log.gen_log
+LOGGER = logging.getLogger('graphite-beacon')
 METHODS = "average", "last_value", "sum", "min", "max"
 LEVELS = {
     'critical': 0,

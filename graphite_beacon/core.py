@@ -15,7 +15,8 @@ except ImportError:
     yaml = None
 
 
-LOGGER = log.gen_log
+#LOGGER = log.gen_log
+LOGGER = logging.getLogger('graphite-beacon')
 
 COMMENT_RE = re('//\s+.*$', M)
 
