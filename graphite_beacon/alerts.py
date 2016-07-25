@@ -262,19 +262,13 @@ class GraphiteAlert(BaseAlert):
         else:
             self.waiting = True
             try:
-<<<<<<< HEAD
                 response = yield self.client.fetch(
                     self.url,
                     auth_username=self.auth_username,
                     auth_password=self.auth_password,
-                    request_timeout=self.request_timeout
+                    request_timeout=self.request_timeout,
+                    connect_timeout=self.connect_timeout
                 )
-                records = (GraphiteRecord(line.decode('utf-8')) for line in response.buffer)
-=======
-                response = yield self.client.fetch(self.url, auth_username=self.auth_username,
-                                                   auth_password=self.auth_password,
-                                                   request_timeout=self.request_timeout,
-                                                   connect_timeout=self.connect_timeout)
                 records = (
                     GraphiteRecord(line.decode('utf-8'), self.default_nan_value, self.ignore_nan)
                     for line in response.buffer)
