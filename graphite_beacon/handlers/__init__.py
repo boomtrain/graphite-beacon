@@ -1,9 +1,10 @@
 from tornado import log
+import logging
 
 from graphite_beacon import _compat as _
 from graphite_beacon.template import TEMPLATES
 
-LOGGER = log.gen_log
+LOGGER = logging.getLogger('graphite-beacon')
 
 
 class HandlerMeta(type):
