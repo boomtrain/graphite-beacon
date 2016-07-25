@@ -17,6 +17,7 @@ except ImportError:
 
 #LOGGER = log.gen_log
 LOGGER = logging.getLogger('graphite-beacon')
+LOGGER = logging.getLogger('graphite-beacon')
 
 COMMENT_RE = re('//\s+.*$', M)
 

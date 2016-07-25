@@ -16,6 +16,7 @@ import math
 from collections import deque, defaultdict
 from itertools import islice
 import urllib
+import logging
 
 #LOGGER = log.gen_log
 LOGGER = logging.getLogger('graphite-beacon')
