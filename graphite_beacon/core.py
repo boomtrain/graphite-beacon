@@ -3,7 +3,7 @@ from re import compile as re, M
 
 import json
 import logging
-from tornado import ioloop, log
+from tornado import ioloop
 
 from .alerts import BaseAlert
 from .utils import parse_interval
@@ -15,8 +15,6 @@ except ImportError:
     yaml = None
 
 
-#LOGGER = log.gen_log
-LOGGER = logging.getLogger('graphite-beacon')
 LOGGER = logging.getLogger('graphite-beacon')
 
 COMMENT_RE = re('//\s+.*$', M)

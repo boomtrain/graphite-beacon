@@ -1,6 +1,6 @@
 """Implement alerts."""
 
-from tornado import ioloop, httpclient as hc, gen, log, escape
+from tornado import ioloop, httpclient as hc, gen, escape
 
 from . import _compat as _
 from .graphite import GraphiteRecord
@@ -18,7 +18,6 @@ from itertools import islice
 import urllib
 import logging
 
-#LOGGER = log.gen_log
 LOGGER = logging.getLogger('graphite-beacon')
 METHODS = "average", "last_value", "sum", "min", "max"
 LEVELS = {

@@ -1,4 +1,3 @@
-from tornado import log
 import logging
 
 from graphite_beacon import _compat as _
